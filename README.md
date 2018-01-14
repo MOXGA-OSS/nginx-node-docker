@@ -55,7 +55,7 @@ The node application should has a serve script in its package.json
 version: '3'
 
 services:
-    ami:
+    nginx-node:
         restart: on-failure
         image: finizco/nginx-node:latest
         ports:
