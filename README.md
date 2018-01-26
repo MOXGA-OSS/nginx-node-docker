@@ -34,18 +34,31 @@ Default node root:
 ```
 
 ## Installing Node App
-To install a Node application in the root, simply map the app volumes to running nginx-node container:
+To install a Node app in the root, simply map the app volumes to running nginx-node container:
 
 ```
 $ docker run -p 8080:8080 -e "NODE_PORT=3000" -v /app:/app -d finizco/nginx-node:latest
 ```
 
-The node application should has a serve script in its package.json
+The node app should has a serve script in its package.json
 
 ```
 "scripts": {
   ...,
   "serve": "node dist/index.js"
+}
+```
+
+## Running Node App on Production (PM2 is recommended)
+
+To run the app on clustering mode with PM2 (Node.JS Process Manager) for production, add "--no-daemon" after the PM2 serve script
+
+For Example:
+
+```
+"scripts": {
+  ...,
+  "serve": "pm2 start dist/index.js -i max --name app --no-daemon"
 }
 ```
 
@@ -62,6 +75,6 @@ services:
         - "8080:8080"
         environment:
         - NODE_PORT=3000
-        volumes
+        volumes:
         - /app:/app
 ```
