@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+    nginx-node:
+        restart: on-failure
+        image: finizco/nginx-node:alpha
+        ports:
+        - "8080:8080"
+        environment:
+        - NODE_PORT=3000
+        - NODE_MODE=dev
+        volumes:
+        - ./app:/app

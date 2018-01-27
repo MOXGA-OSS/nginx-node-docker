@@ -27,6 +27,7 @@ RUN apt-get update \
 RUN pip install wheel
 RUN pip install supervisor supervisor-stdout
 ADD ./supervisord.conf /etc/supervisord.conf
+ADD ./supervisord-dev.conf /etc/supervisord-dev.conf
 
 # Avoid ERROR: invoke-rc.d: policy-rc.d denied execution of start.
 RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d
