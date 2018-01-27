@@ -28,7 +28,7 @@ To run the container:
 $ docker run -p 8080:8080 -e "NODE_PORT=3000" -d finizco/nginx-node:latest
 ```
 
-Default node root:
+Default Node root:
 ```
 /app
 ```
@@ -40,7 +40,7 @@ To install a Node app in the root, simply map the app volumes to running nginx-n
 $ docker run -p 8080:8080 -e "NODE_PORT=3000" -v /app:/app -d finizco/nginx-node:latest
 ```
 
-The node app should has a serve script in its package.json
+The Node app should has a serve script in its package.json
 
 ```
 "scripts": {
@@ -62,6 +62,12 @@ For Example:
 }
 ```
 
+## Environment Variables
+
+NODE_PORT - A port that the Node app is listening on (default is 3000).
+
+NODE_MODE - A mode of the running Node app (Specify prod for production, dev for development, default is prod).
+
 ## Docker-Compose Example
 
 ```
@@ -75,6 +81,7 @@ services:
         - "8080:8080"
         environment:
         - NODE_PORT=3000
+        - NODE_MODE=prod
         volumes:
         - /app:/app
 ```
