@@ -16,6 +16,10 @@
 
 FROM debian:stretch
 
+# Maintainer
+
+LABEL maintainer="Finiz Open Source Software <developer@finiz.in.th>"
+
 # Let the container know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
 
