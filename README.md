@@ -75,7 +75,7 @@ version: '3'
 
 services:
     nginx-node:
-        restart: on-failure
+        restart: always
         image: finizco/nginx-node:latest
         ports:
         - "8080:8080"
@@ -85,3 +85,6 @@ services:
         volumes:
         - /app:/app
 ```
+## License
+
+Nginx-Node-Docker is Apache Licensed.
