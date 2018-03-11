@@ -2,9 +2,9 @@
 This is a debian based container image running Nginx reversing proxy with Node v9.x (Yarn Support)
 
 ### Versioning
-| Docker Tag | GitHub Release | Nginx Version | Node Version | Debian Version |
+| Docker Tag | GitHub Release | Nginx Version | Node Version | Alpine Version |
 |-----|-------|-----|--------|--------|
-| latest | master | 1.12.2 | 9.4.0 | stretch |
+| latest | master | 1.12.2 | 9.8.0 | 3.7 |
 
 ## Building from source
 To build from source you need to clone the git repo and run docker build:

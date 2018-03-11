@@ -12,36 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# From Debian 9 official image
-
-FROM debian:stretch
+# From Alpine official image
+FROM alpine:latest
 
 # Maintainer
-
 LABEL maintainer="Finiz Open Source Software <developer@finiz.in.th>"
 
-# Let the container know that there is no tty
-ENV DEBIAN_FRONTEND noninteractive
+# Update apk repositories to be latest
+RUN apk update
 
-# Install Basic Requirements
-RUN apt-get update \
-    && apt-get install --no-install-recommends --no-install-suggests -q -y \
-    apt-transport-https \
-    lsb-release \
-    wget \
-    apt-utils \
-    gnupg \
-    curl \
-    nano \
-    zip \
-    unzip \
-    python-pip \
-    python-setuptools \
-    dirmngr \
-    git \
-    ca-certificates
-
-# Supervisor config
+# Install and config Supervisor
+RUN apk add python py2-pip
 RUN pip install wheel
 RUN pip install supervisor supervisor-stdout
 ADD ./supervisord.conf /etc/supervisord.conf
@@ -50,45 +31,105 @@ ADD ./supervisord-dev.conf /etc/supervisord-dev.conf
 # Avoid ERROR: invoke-rc.d: policy-rc.d denied execution of start.
 RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d
 
-# Add sources for latest nginx
-RUN wget http://nginx.org/keys/nginx_signing.key && apt-key add nginx_signing.key \
-&& echo "deb http://nginx.org/packages/debian/ stretch nginx" | tee -a /etc/apt/sources.list \
-&& echo "deb-src http://nginx.org/packages/debian/ stretch nginx" | tee -a /etc/apt/sources.list \
-&& apt-get update
+# Install Nginx
+RUN apk add nginx
 
-# Install nginx
-RUN apt-get install --no-install-recommends --no-install-suggests -q -y nginx
-
-# Override nginx's default config
+# Override Nginx's default config
 RUN rm -rf /etc/nginx/conf.d/default.conf
 ADD nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Install Node.js v9.x
-RUN curl -sL https://deb.nodesource.com/setup_9.x | bash - && \
-    apt-get install -y nodejs
+# Build Node.js 9.x
+ENV NODE_VERSION 9.8.0
 
-# Install Yarn Package Manager
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-&& echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-&& apt-get update && apt-get install -y yarn
+RUN addgroup -g 1000 node \
+    && adduser -u 1000 -G node -s /bin/sh -D node \
+    && apk add --no-cache \
+        libstdc++ \
+    && apk add --no-cache --virtual .build-deps \
+        binutils-gold \
+        curl \
+        g++ \
+        gcc \
+        gnupg \
+        libgcc \
+        linux-headers \
+        make \
+        python \
+  # gpg keys listed at https://github.com/nodejs/node#release-team
+  && for key in \
+    94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
+    FD3A5288F042B6850C66B31F09FE44734EB7990E \
+    71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
+    DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
+    C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
+    B9AE9905FFD7803F25714661B63B535A4C206CA9 \
+    56730D5401028683275BD23C23EFEFE93C4CFFFE \
+    77984A986EBC2AA786BC0F66B01FBB92821C587A \
+  ; do \
+    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
+    gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
+    gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+  done \
+    && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.xz" \
+    && curl -SLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+    && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+    && grep " node-v$NODE_VERSION.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
+    && tar -xf "node-v$NODE_VERSION.tar.xz" \
+    && cd "node-v$NODE_VERSION" \
+    && ./configure \
+    && make -j$(getconf _NPROCESSORS_ONLN) \
+    && make install \
+    && apk del .build-deps \
+    && cd .. \
+    && rm -Rf "node-v$NODE_VERSION" \
+    && rm "node-v$NODE_VERSION.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt
+
+# Build Yarn Package Manager 1.5.x
+ENV YARN_VERSION 1.5.1
+
+RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
+  && for key in \
+    6A010C5166006599AA17F08146C2130DFD2497F5 \
+  ; do \
+    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
+    gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
+    gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+  done \
+  && curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
+  && curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
+  && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
+  && mkdir -p /opt/yarn \
+  && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/yarn --strip-components=1 \
+  && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn \
+  && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarnpkg \
+  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
+  && apk del .build-deps-yarn
 
 # Add Node.js app
 COPY app /app
 
 # Install app packages
 WORKDIR /app
+
 RUN yarn
 
 # Build app packages
 RUN yarn build
 
-# Clean up
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install Bash Shell
+RUN apk add --update bash
 
-# Add scripts
+# Clean up
+RUN rm -rf /var/cache/apk/*
+
+# Add a startup script
 ADD ./start.sh /start.sh
 RUN chmod 755 /start.sh
 
+# Expose Nginx port
 EXPOSE 8080
+
+# Run the startup script
+WORKDIR /
 
 CMD ["/start.sh"]
