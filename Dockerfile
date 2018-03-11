@@ -21,6 +21,9 @@ LABEL maintainer="Finiz Open Source Software <developer@finiz.in.th>"
 # Update apk repositories to be latest
 RUN apk update
 
+# Install git
+RUN apk add git
+
 # Install and config Supervisor
 RUN apk add python py2-pip
 RUN pip install wheel
