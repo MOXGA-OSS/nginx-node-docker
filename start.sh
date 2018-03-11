@@ -31,6 +31,7 @@ procs=$(cat /proc/cpuinfo |grep processor | wc -l)
 sed -i -e "s/worker_processes  1/worker_processes $procs/" /etc/nginx/nginx.conf
 
 # Always chown webroot for better mounting
+mkdir -p /usr/share/nginx/html
 chown -Rf nginx.nginx /usr/share/nginx/html
 
 # Start supervisord and services
@@ -41,8 +42,11 @@ else
   NODE_MODE="${NODE_MODE}"
 fi
 
+# Create Nginx pid
+mkdir -p /run/nginx
+
 if [[ "${NODE_MODE}" = "prod" ]]; then
-/usr/local/bin/supervisord -n -c /etc/supervisord.conf
+/usr/bin/supervisord -n -c /etc/supervisord.conf
 elif [[ "${NODE_MODE}" = "dev" ]]; then
-/usr/local/bin/supervisord -n -c /etc/supervisord-dev.conf
+/usr/bin/supervisord -n -c /etc/supervisord-dev.conf
 fi
