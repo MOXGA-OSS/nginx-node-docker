@@ -1,5 +1,5 @@
 ## Introduction
-This is a debian based container image running Nginx reversing proxy with Node v9.x (Yarn Support)
+This is an Alpine based container image running Nginx reversing proxy with Node v9.x (Yarn Support)
 
 ### Versioning
 | Docker Tag | GitHub Release | Nginx Version | Node Version | Alpine Version |
