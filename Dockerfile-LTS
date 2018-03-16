@@ -42,10 +42,10 @@ RUN rm -rf /etc/nginx/conf.d/default.conf
 ADD nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Install Node.js 8.10.0 LTS and NPM
-RUN apk add --update nodejs nodejs-npm
+RUN apk add nodejs=8.10.0-r0 nodejs-npm=8.10.0-r0
 
 # Install Yarn Package Manager 1.5.1
-RUN apk add --update yarn
+RUN apk add yarn=1.5.1-r0
 
 # Add Node.js app
 COPY app /app
