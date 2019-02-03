@@ -4,13 +4,13 @@ This is an Alpine based container image running Nginx reversing proxy with Node 
 ### Versioning
 | Docker Tag | GitHub Release | Nginx Version | Node Version | Alpine Version |
 |-----|-------|-----|--------|--------|
-| latest | master | 1.12.2 | 9.8.0 | 3.7 |
-| latest-lts | master-lts | 1.12.2 | 8.10.0 LTS | 3.7 |
+| latest | master | 1.12.2 | 11.9.0 | 3.9 |
+| latest-lts | master-lts | 1.12.2 | 10.15.1 LTS | 3.9 |
 
 ## Building from source
 To build from source you need to clone the git repo and run docker build:
 ```
-$ git clone https://github.com/Finiz/nginx-node-docker.git
+$ git clone https://github.com/MOXGA-OSS/nginx-node-docker.git
 ```
 
 followed by
