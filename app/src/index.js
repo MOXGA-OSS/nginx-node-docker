@@ -1,4 +1,4 @@
-/* Copyright 2018 Finiz Open Source Software
+/* Copyright 2019 Finiz Open Source Software
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
