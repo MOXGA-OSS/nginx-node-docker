@@ -41,8 +41,8 @@ RUN apk add nginx
 RUN rm -rf /etc/nginx/conf.d/default.conf
 ADD nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Build Node.js 9.x
-ENV NODE_VERSION 9.8.0
+# Build Node.js 11.x
+ENV NODE_VERSION 11.9.0
 
 RUN addgroup -g 1000 node \
     && adduser -u 1000 -G node -s /bin/sh -D node \

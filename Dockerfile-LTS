@@ -41,7 +41,7 @@ RUN apk add nginx
 RUN rm -rf /etc/nginx/conf.d/default.conf
 ADD nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Install Node.js 8.10.0 LTS and NPM
+# Install Node.js 10.15.1 LTS and NPM
 RUN apk add --update-cache nodejs nodejs-npm --repository http://dl-3.alpinelinux.org/alpine/edge/main/
 
 # Install Yarn Package Manager 1.5.1
